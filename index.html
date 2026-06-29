@@ -42,15 +42,24 @@
     </div>
 
     <script>
-        // Extraemos el código que el bot colocó en el botón
+        // Extraemos los parámetros que el bot colocará en la URL
         const urlParams = new URLSearchParams(window.location.search);
         const code = urlParams.get('code');
+        const placeId = urlParams.get('placeId');
+        const linkCode = urlParams.get('linkCode');
+
+        let robloxUri = "";
 
         if (code) {
-            // Creamos el enlace de protocolo directo que inicia Roblox sin usar Google
-            const robloxUri = `roblox://navigation/share_links?code=${code}&type=Server`;
-            
-            // Forzamos la apertura de la aplicación de Roblox
+            // Caso para enlaces de tipo "Share" modernos
+            robloxUri = `roblox://navigation/share_links?code=${code}&type=Server`;
+        } else if (placeId && linkCode) {
+            // Caso para enlaces clásicos de servidor privado (como el de tu captura)
+            robloxUri = `roblox://experiences/start?placeId=${placeId}&linkCode=${linkCode}`;
+        }
+
+        if (robloxUri) {
+            // Forzamos la apertura de la aplicación de Roblox directamente sin abrir la web de Roblox
             window.location.href = robloxUri;
 
             // Intento secundario por si el navegador bloquea la acción automática
@@ -58,7 +67,7 @@
                 window.location.href = robloxUri;
             }, 2000);
         } else {
-            document.querySelector('p').innerText = "Error: No se ha detectado ningún código de sesión activo.";
+            document.querySelector('p').innerText = "Error: No se ha detectado ningún código o servidor activo.";
         }
     </script>
 </body>
